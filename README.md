@@ -1,6 +1,6 @@
 # Rate-Limiter
 A simple homemade rate limiter
-## Installation and Building
+## Installation and Running
 
 ```bash
 # clone repository
@@ -12,6 +12,9 @@ make docker
 
 # running redis & golang application locally
 docker-compose up
+
+# start sending request to test the behavior of rate limiter
+make test-api
 
 ```
 
@@ -47,6 +50,9 @@ make test-api
 
 # build image
 make docker
+
+# go lint
+make lint
 
 ```
 
