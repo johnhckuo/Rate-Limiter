@@ -56,16 +56,19 @@ func (r *RedisLimiter) Limit(next http.Handler) http.Handler {
 		}
 
 		// only path "/" will be rate limited
+		// path /reset will reset all the counter to 0 for easier testing, it's for testing purpose so will not be rate limited
 		if url == "/" {
 
-			// Call the getRateLimiter function to retreive the rate limiter for the current user.
 			keyName := utils.NewKeyName(req.Method, req.RequestURI, ip)
+
+			// Call the getRateLimiter function to retreive the rate limiter for the current user.
 			r.getRateLimiter(keyName)
 
 			if r.allow(keyName) == false {
 				http.Error(w, http.StatusText(429), http.StatusTooManyRequests)
 				return
 			}
+
 		} else if url == "/reset" {
 
 			keyName := utils.NewKeyName("get", "/", ip)
@@ -84,9 +87,8 @@ func (r *RedisLimiter) Limit(next http.Handler) http.Handler {
 // already exists. Otherwise create a new rate limit counter in redis and using the method + url + IP address as the key.
 func (r *RedisLimiter) getRateLimiter(hashKey string) {
 	r.mu.Lock()
-	//defer req.mu.Unlock()
-	expiration, _ := strconv.ParseInt(os.Getenv(environment.RateLimitExpirationSecond), 10, 64)
 
+	expiration, _ := strconv.ParseInt(os.Getenv(environment.RateLimitExpirationSecond), 10, 64)
 	_, exists := r.visitors[hashKey]
 	if !exists {
 		burst, _ := strconv.Atoi(os.Getenv(environment.BurstLimit))
@@ -113,16 +115,20 @@ func (r *RedisLimiter) getRateLimiter(hashKey string) {
 
 func (r *RedisLimiter) allow(hashKey string) bool {
 	log.Printf("Checking API usage of key: %v", hashKey)
+
+	//increase per minute rate limit counter
 	counter, err := r.client.Incr(hashKey)
 	log.Printf("per_minute_counter: %v \n", counter)
+	//check if exceed the limit of this ip address
 	if counter > r.visitors[hashKey].limit || err != nil {
 		log.Printf("key %v per minute limit exceeded", hashKey)
 		return false
 	}
 
+	//increase burst rate limit counter
 	burstCounter, err := r.client.Incr(hashKey + "_burst")
 	log.Printf("burst_counter: %v \n", burstCounter)
-
+	//check if exceed the limit of this ip address
 	if burstCounter > int64(r.visitors[hashKey].burst) || err != nil {
 		log.Printf("key %v burst limit exceeded", hashKey)
 		return false
@@ -135,11 +141,13 @@ func (r *RedisLimiter) reset(hashKey string) error {
 	log.Printf("Resetting key %v", hashKey)
 	expiration, _ := strconv.Atoi(os.Getenv(environment.RateLimitExpirationSecond))
 
+	// reset per minute rate limit counter
 	err := r.client.Reset(hashKey, expiration)
 	if err != nil {
 		return err
 	}
 
+	// reset burst rate limit counter
 	err = r.client.Reset(hashKey+"_burst", 1)
 	if err != nil {
 		return err

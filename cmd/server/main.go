@@ -16,24 +16,13 @@ import (
 	"github.com/johnhckuo/Rate-Limiter/pkg/limiter"
 )
 
-func okHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("OK"))
-}
-
-func resetHandler(w http.ResponseWriter, r *http.Request) {
-
-	w.Write([]byte("RESET"))
-}
-
 func main() {
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", okHandler)
 
+	mux.HandleFunc("/", okHandler)
 	mux.HandleFunc("/reset", resetHandler)
 
-	// Wrap the servemux with the limit middleware.
-	log.Println("Listening on :4000...")
 	var limiterClient limiter.Limiter
 
 	val := strings.ToUpper(os.Getenv(environment.RateLimiter))
@@ -55,6 +44,9 @@ func main() {
 			log.Fatalf("%v", err)
 		}
 	}()
+
+	log.Println("Listening on :4000...")
+
 	c := make(chan os.Signal, 1)
 
 	// We'll accept graceful shutdowns when quit via SIGINT (Ctrl+C)
@@ -73,6 +65,14 @@ func main() {
 
 	log.Println("Server exiting")
 
+}
+
+func okHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("OK"))
+}
+
+func resetHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("RESET"))
 }
 
 func init() {
