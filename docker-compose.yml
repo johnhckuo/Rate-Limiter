@@ -1,0 +1,26 @@
+version : '3'
+services :
+  redis :
+    container_name : 'redis'
+    image : redis
+    command : redis-server
+    restart : always
+    ports :
+      - "6380:6379"
+  backend :
+    image : 'johnhckuo/rate-limiter'
+    container_name : 'rate-limiter'
+    build : ./
+    # replace .env
+    environment :
+      RATE_LIMITER: REDIS_LIMITER
+      PERSIST_STORAGE: REDIS_STORAGE
+      DB_CONNECTION_STRING: redis://redis:6379
+      RATE_LIMIT: 60
+      RATE_LIMIT_EXPIRATION_SECOND: 60
+      BURST_LIMIT: 10
+    restart : always
+    ports :
+    - "4000:4000"
+    depends_on :
+      - redis
