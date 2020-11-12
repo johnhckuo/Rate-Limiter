@@ -17,18 +17,18 @@ docker-compose up
 
 ## Environment variables
 
-- RATE_LIMITER=REDIS_LIMITER
-> It is used to decide which rate limiter to use
-- PERSIST_STORAGE=REDIS_STORAGE
-> It's used to decide which storage type to use
+- RATE_LIMITER
+> It is used to decide which rate limiter to use, default value is `REDIS_LIMITER`
+- PERSIST_STORAGE
+> It's used to decide which storage type to use, default value is `REDIS_STORAGE`
 - DB_CONNECTION_STRING=redis://localhost:6379
 > DB connection string
-- RATE_LIMIT=60  
-> This is the number of request we can allow per `RATE_LIMIT_EXPIRATION_SECOND`
-- BURST_LIMIT=10  
-> The number of burst request within 1 second
-- RATE_LIMIT_EXPIRATION_SECOND=60
-> Time interval of `RATE_LIMIT`
+- RATE_LIMIT  
+> This is the number of request we can allow per `RATE_LIMIT_EXPIRATION_SECOND`, default value is 60
+- BURST_LIMIT
+> The number of burst request within 1 second, default value is 10
+- RATE_LIMIT_EXPIRATION_SECOND
+> Time interval of `RATE_LIMIT`, default value is 60 (seconds)
 
 
 ## Commands
