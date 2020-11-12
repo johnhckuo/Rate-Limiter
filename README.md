@@ -20,9 +20,13 @@ docker-compose up
 - RATE_LIMITER=REDIS_LIMITER
 - PERSIST_STORAGE=REDIS_STORAGE
 - DB_CONNECTION_STRING=redis://localhost:6379
-- RATE_LIMIT=60
+- RATE_LIMIT=60  
+> This is the number of request we can allow per `RATE_LIMIT_EXPIRATION_SECOND`
+- BURST_LIMIT=10  
+> The number of burst request within 1 second
 - RATE_LIMIT_EXPIRATION_SECOND=60
-- BURST_LIMIT=10
+> Time interval of `RATE_LIMIT`
+
 
 ## Commands
 
@@ -30,7 +34,7 @@ docker-compose up
 # running the application locally
 make run
 
-# starting sending request to test the behavior of rate limiter
+# start sending request to test the behavior of rate limiter
 make test-api
 
 # build image
