@@ -1,6 +1,6 @@
 # Rate-Limiter
 A simple homemade rate limiter
-## Installation and Building
+## Installation and Running
 
 ```bash
 # clone repository
@@ -13,16 +13,31 @@ make docker
 # running redis & golang application locally
 docker-compose up
 
+# start sending request to test the behavior of rate limiter
+make test-api
+
 ```
 
 ## Environment variables
 
-- RATE_LIMITER=REDIS_LIMITER
-- PERSIST_STORAGE=REDIS_STORAGE
-- DB_CONNECTION_STRING=redis://localhost:6379
-- RATE_LIMIT=60
-- RATE_LIMIT_EXPIRATION_SECOND=60
-- BURST_LIMIT=10
+RATE_LIMITER
+> It is used to decide which rate limiter to use, default value is `REDIS_LIMITER`
+
+PERSIST_STORAGE
+> It's used to decide which storage type to use, default value is `REDIS_STORAGE`
+
+DB_CONNECTION_STRING=redis://localhost:6379
+> DB connection string
+
+RATE_LIMIT  
+> This is the number of request we can allow per `RATE_LIMIT_EXPIRATION_SECOND`, default value is 60
+
+BURST_LIMIT
+> The number of burst request within 1 second, default value is 10
+
+RATE_LIMIT_EXPIRATION_SECOND
+> Time interval of `RATE_LIMIT`, default value is 60 (seconds)
+
 
 ## Commands
 
@@ -30,11 +45,14 @@ docker-compose up
 # running the application locally
 make run
 
-# starting sending request to test the behavior of rate limiter
+# start sending request to test the behavior of rate limiter
 make test-api
 
 # build image
 make docker
+
+# go lint
+make lint
 
 ```
 
