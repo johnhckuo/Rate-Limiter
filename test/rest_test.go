@@ -18,6 +18,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+//test /reset endpoint
 func Test_Reset(t *testing.T) {
 	err := godotenv.Load()
 	if err != nil {
@@ -28,6 +29,8 @@ func Test_Reset(t *testing.T) {
 	resp, _ := client.R().Get("http://localhost:4000/reset")
 	assert.Equal(t, 200, resp.StatusCode())
 }
+
+//sending 1 request, then reset for next test
 func Test_Basic(t *testing.T) {
 
 	client := resty.New()
@@ -40,6 +43,7 @@ func Test_Basic(t *testing.T) {
 
 }
 
+//sending 10 request sequentially
 func Test_Multiple(t *testing.T) {
 
 	client := resty.New()
@@ -55,6 +59,7 @@ func Test_Multiple(t *testing.T) {
 
 }
 
+//sending 11 request within one second
 func Test_Exceed_Burst(t *testing.T) {
 	client := resty.New()
 	var wg sync.WaitGroup
@@ -84,6 +89,7 @@ func Test_Exceed_Burst(t *testing.T) {
 	assert.Equal(t, 200, resp.StatusCode())
 }
 
+//sending 61 request within one minute
 func Test_One_Minute_Exceed(t *testing.T) {
 	client := resty.New()
 
@@ -105,6 +111,7 @@ func Test_One_Minute_Exceed(t *testing.T) {
 	assert.Equal(t, 200, resp.StatusCode())
 }
 
+//sending 120 request within two minutes
 func Test_Two_Minute(t *testing.T) {
 	client := resty.New()
 
