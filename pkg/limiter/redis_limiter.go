@@ -139,7 +139,7 @@ func (r *RedisLimiter) allow(hashKey string) bool {
 
 func (r *RedisLimiter) reset(hashKey string) error {
 	log.Printf("Resetting key %v", hashKey)
-	expiration, _ := strconv.Atoi(os.Getenv(environment.RateLimitExpirationSecond))
+	expiration, _ := strconv.ParseInt(os.Getenv(environment.RateLimitExpirationSecond), 10, 64)
 
 	// reset per minute rate limit counter
 	err := r.client.Reset(hashKey, expiration)

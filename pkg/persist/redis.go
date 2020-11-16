@@ -2,6 +2,7 @@ package persist
 
 import (
 	"context"
+	"errors"
 	"log"
 	"time"
 
@@ -35,8 +36,14 @@ func NewRedis(connectionString string) *Redis {
 }
 
 //SetNX will set a value to the given key if the key is not existed, or else do nothing
-func (r *Redis) SetNX(key string, val interface{}, duration int64) error {
-	if ok, err := r.client.SetNX(key, val, time.Duration(duration)*time.Second).Result(); !ok {
+func (r *Redis) SetNX(key string, val interface{}, expiration int64) error {
+	if key == "" {
+		return errors.New("Key is empty")
+	}
+	if val == "" {
+		return errors.New("Value is empty")
+	}
+	if ok, err := r.client.SetNX(key, val, time.Duration(expiration)*time.Second).Result(); !ok {
 		return err
 	}
 	return nil
@@ -70,7 +77,9 @@ func (r *Redis) HSetNX(key string, duration int64) error {
 
 //Incr increase the give key by one
 func (r *Redis) Incr(key string) (int64, error) {
-
+	if key == "" {
+		return 0, errors.New("Key is empty")
+	}
 	incr, err := r.client.Incr(key).Result()
 	if err != nil {
 		return -1, err
@@ -79,8 +88,13 @@ func (r *Redis) Incr(key string) (int64, error) {
 }
 
 //Reset will reset the value of the given key to 0
-func (r *Redis) Reset(key string, expiration int) error {
-
+func (r *Redis) Reset(key string, expiration int64) error {
+	if key == "" {
+		return errors.New("Key is empty")
+	}
+	if expiration == 0 {
+		return errors.New("Expiration is empty")
+	}
 	_, err := r.client.Set(key, 0, time.Duration(expiration)*time.Second).Result()
 	if err != nil {
 		return err
